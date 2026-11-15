@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {slide, move, newGame, outcome, restore} from '../dist/game.mjs';
+import {slide, planMove, move, newGame, outcome, restore} from '../dist/game.mjs';
 import {cards, stages, publishedCards} from '../dist/catalog.mjs';
 
 const padding = row => [...row, ...Array(16 - row.length).fill(0)];
@@ -13,6 +13,20 @@ test('merge once per tile and add the new tile values to score', () => {
   assert.deepEqual(slide(padding([2, 2, 2, 0]), 'right').board, padding([0, 0, 2, 4]));
   assert.deepEqual(slide(padding([2, 4, 2, 0, 2, 0, 2, 0]), 'up').board, padding([4, 4, 4, 0]));
   assert.deepEqual(slide(padding([2, 0, 0, 0, 0, 0, 0, 0, 2]), 'down').board, [...Array(12).fill(0), 4, 0, 0, 0]);
+});
+
+test('move animation identifies tile sources, distinct merges and the spawned tile', () => {
+  const board = padding([0, 2, 2, 4, 4, 4, 4, 4]);
+  const plan = planMove(stateFor(board), 'left', low);
+  assert.deepEqual(plan.paths, [
+    {from: 1, to: 0}, {from: 2, to: 0}, {from: 3, to: 1},
+    {from: 5, to: 4}, {from: 6, to: 5}, {from: 7, to: 5}
+  ]);
+  assert.deepEqual(plan.merged, [0, 4, 5]);
+  assert.equal(plan.spawned, 2);
+  assert.deepEqual(plan.state.board, padding([4, 4, 2, 0, 8, 8, 0, 0]));
+  assert.equal(plan.state.score, 20);
+  assert.deepEqual(board, padding([0, 2, 2, 4, 4, 4, 4, 4]));
 });
 
 test('invalid moves preserve state and consume no randomness', () => {

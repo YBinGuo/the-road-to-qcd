@@ -47,12 +47,14 @@ nav a:hover { text-decoration: underline; }
   display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(4, minmax(0, 1fr));
   width: 100%; aspect-ratio: 1; gap: clamp(6px, 1.25vw, 11px); padding: clamp(8px, 1.4vw, 13px);
   border-radius: 17px; background: #22382f; touch-action: none; user-select: none;
-  box-shadow: 0 9px 23px #23382f21; container-type: inline-size;
+  box-shadow: 0 9px 23px #23382f21; container-type: inline-size; isolation: isolate;
 }
+.cell { min-width: 0; min-height: 0; border-radius: 9px; background: #364f43; }
 .tile {
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
-  border-radius: 9px; min-width: 0; background: #364f43; color: #1c3227; text-align: center; padding: 4px;
+  border-radius: 9px; height: 100%; min-width: 0; color: #1c3227; text-align: center; padding: 4px;
 }
+.tile.moving { position: relative; z-index: 1; }
 .tile > strong { font-family: var(--mono); font-size: clamp(20px, 8.6cqw, 47px); line-height: 1; letter-spacing: -.06em; }
 .tile[data-large="true"] > strong { font-size: clamp(17px, 6.4cqw, 35px); }
 .tile small { font-size: clamp(11px, 3.2cqw, 16px); line-height: 1.12; font-weight: 650; max-width: 100%; overflow-wrap: anywhere; }
@@ -63,7 +65,7 @@ nav a:hover { text-decoration: underline; }
 [data-value="512"] { background: #dcb4ce; } [data-value="1024"] { background: #c5bae3; }
 [data-value="2048"] { background: #ede2ab; outline: 2px solid #f4edcd; outline-offset: -4px; }
 .tile[data-large="true"]:not([data-value="1024"]):not([data-value="2048"]) { background: #d9b7ee; }
-.end { position: absolute; inset: 0; background: #163025bb; border-radius: 17px; display: grid; place-items: center; padding: 22px; text-align: center; }
+.end { position: absolute; z-index: 1; inset: 0; background: #163025bb; border-radius: 17px; display: grid; place-items: center; padding: 22px; text-align: center; }
 .end > div { background: var(--panel); border-radius: 14px; padding: 24px; width: min(100%, 320px); }
 .end h2 { margin: 0; }
 .end p { color: var(--muted); }

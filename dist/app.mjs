@@ -1,4 +1,4 @@
-import {move, newGame, outcome, restore, SAVE_KEY} from './game.mjs';
+import {planMove, newGame, outcome, restore, SAVE_KEY} from './game.mjs';
 import {stages, types, publishedCards, references} from './catalog.mjs';
 import {demos} from './demos.mjs';
 import {LANGUAGE_KEY, languages} from './i18n.mjs';
@@ -15,6 +15,8 @@ let displayedUnlock = 0;
 let demoSession;
 let gesture;
 let activeStage;
+let activeTurn;
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 let language = loadLanguage();
 let strings = languages[language];
 
@@ -55,6 +57,7 @@ function renderLanguage() {
 }
 
 function switchLanguage() {
+  stopTurn();
   language = language === 'en' ? 'zh-CN' : 'en';
   strings = languages[language];
   try {
@@ -135,7 +138,9 @@ function render() {
       tile.append(node('strong', '', String(value)));
       if (stage) tile.append(node('small', '', stageShort(stage)));
     }
-    return tile;
+    const cell = node('div', 'cell');
+    cell.append(tile);
+    return cell;
   }));
 
   if (displayedUnlock !== state.unlocked) renderAtlas();
@@ -155,13 +160,57 @@ function commit() {
   render();
 }
 
-function shift(direction) {
-  if (dialog.open) return;
-  const next = move(state, direction);
-  if (next === state) return;
-  const newlyUnlocked = stages.filter(stage => stage.value > state.unlocked && stage.value <= next.unlocked);
-  state = next;
-  commit();
+function stopTurn() {
+  const turn = activeTurn;
+  activeTurn = undefined;
+  turn?.animations.forEach(animation => animation.cancel());
+}
+
+async function shift(direction) {
+  if (dialog.open || activeTurn) return;
+  const plan = planMove(state, direction);
+  if (!plan) return;
+  const newlyUnlocked = stages.filter(stage => stage.value > state.unlocked && stage.value <= plan.state.unlocked);
+  state = plan.state;
+  save();
+
+  if (!reduceMotion.matches && typeof board.animate === 'function') {
+    const cells = [...board.children];
+    const positions = cells.map(cell => cell.getBoundingClientRect());
+    const animations = plan.paths.map(({from, to}) => {
+      const x = positions[to].left - positions[from].left;
+      const y = positions[to].top - positions[from].top;
+      const tile = cells[from].firstElementChild;
+      tile.classList.add('moving');
+      return tile.animate(
+        [{transform: 'translate(0, 0)'}, {transform: 'translate(' + x + 'px, ' + y + 'px)'}],
+        {duration: 190, easing: 'cubic-bezier(.2, .65, .3, 1)', fill: 'forwards'}
+      );
+    });
+    const turn = {animations};
+    activeTurn = turn;
+    await Promise.allSettled(animations.map(animation => animation.finished));
+    if (activeTurn !== turn) return;
+    render();
+    animations.forEach(animation => animation.cancel());
+
+    const pulse = plan.merged.map(index => board.children[index].firstElementChild.animate(
+      [{transform: 'scale(.94)'}, {transform: 'scale(1.075)'}, {transform: 'scale(1)'}],
+      {duration: 140, easing: 'ease-out'}
+    ));
+    if (plan.spawned !== -1) {
+      pulse.push(board.children[plan.spawned].firstElementChild.animate(
+        [{opacity: .2, transform: 'scale(.85)'}, {opacity: 1, transform: 'scale(1)'}],
+        {duration: 115, easing: 'ease-out'}
+      ));
+    }
+    turn.animations = pulse;
+    await Promise.allSettled(pulse.map(animation => animation.finished));
+    if (activeTurn !== turn) return;
+    activeTurn = undefined;
+  } else {
+    render();
+  }
   const result = outcome(state);
   byId('announcement').textContent = [
     ...newlyUnlocked.map(stage => strings.unlockEvent(stageTitle(stage))),
@@ -170,6 +219,7 @@ function shift(direction) {
 }
 
 function restart() {
+  stopTurn();
   state = newGame(state);
   commit();
   byId('announcement').textContent = strings.started;
@@ -322,7 +372,7 @@ document.addEventListener('keydown', event => {
   const direction = keys.get(event.key);
   if (!direction || dialog.open || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
   event.preventDefault();
-  shift(direction);
+  if (!event.repeat) shift(direction);
 });
 
 board.addEventListener('pointerdown', event => {
@@ -348,6 +398,7 @@ document.querySelectorAll('[data-direction]').forEach(button => {
 byId('restart').addEventListener('click', restart);
 endAction.addEventListener('click', () => {
   if (outcome(state) === 'won') {
+    stopTurn();
     state = {...state, continued: true};
     commit();
   } else {

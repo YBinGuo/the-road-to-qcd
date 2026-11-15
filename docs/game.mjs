@@ -12,20 +12,28 @@ function lines(direction) {
   );
 }
 
-export function slide(board, direction) {
+export function slide(board, direction, motion) {
   const next = [...board];
   let points = 0;
   for (const line of lines(direction)) {
-    const values = line.map(index => board[index]).filter(Boolean);
+    const occupied = line.filter(index => board[index]);
     let output = 0;
-    for (let input = 0; input < values.length; input++) {
-      let value = values[input];
-      if (value === values[input + 1]) {
+    for (let input = 0; input < occupied.length; input++) {
+      const from = occupied[input];
+      const to = line[output++];
+      const partner = occupied[input + 1];
+      let value = board[from];
+      if (from !== to) motion?.paths.push({from, to});
+      if (value === board[partner]) {
+        if (motion) {
+          motion.paths.push({from: partner, to});
+          motion.merged.push(to);
+        }
         value *= 2;
         points += value;
         input++;
       }
-      next[line[output++]] = value;
+      next[to] = value;
     }
     for (; output < SIZE; output++) next[line[output]] = 0;
   }
@@ -56,13 +64,19 @@ export function outcome(state) {
   return hasMoves(state.board) ? 'playing' : 'lost';
 }
 
-export function move(state, direction, random = Math.random) {
-  if (!directions.includes(direction) || outcome(state) !== 'playing') return state;
-  const result = slide(state.board, direction);
-  if (!result.changed) return state;
-  const board = spawn(result.board, random);
+export function planMove(state, direction, random = Math.random) {
+  if (!directions.includes(direction) || outcome(state) !== 'playing') return null;
+  const motion = {paths: [], merged: []};
+  const result = slide(state.board, direction, motion);
+  if (!result.changed) return null;
+  const board = spawn([...result.board], random);
   const score = state.score + result.points;
-  return {...state, board, score, best: Math.max(state.best, score), unlocked: Math.max(state.unlocked, ...board)};
+  const next = {...state, board, score, best: Math.max(state.best, score), unlocked: Math.max(state.unlocked, ...board)};
+  return {...motion, spawned: board.findIndex((value, index) => value !== result.board[index]), state: next};
+}
+
+export function move(state, direction, random = Math.random) {
+  return planMove(state, direction, random)?.state ?? state;
 }
 
 function tile(value) {
