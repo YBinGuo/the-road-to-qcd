@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A tile-merging game and field theory atlas, from Ising to QCD.">
+  <meta name="theme-color" content="#eef1e8">
+  <title>The Road to QCD</title>
+  <link rel="stylesheet" href="./style.css">
+  <script type="module" src="./app.mjs"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="top-inner">
+      <a class="brand" href="#game">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <span data-text="siteTitle">The Road to QCD</span>
+      </a>
+      <nav aria-label="Page navigation" data-label="nav">
+        <a href="#game" data-text="game">Game</a>
+        <a href="#atlas" data-text="atlasNav">Atlas</a>
+        <button class="language" type="button" data-language></button>
+      </nav>
+    </div>
+  </header>
+  <main class="layout">
+    <section class="play" id="game" aria-labelledby="title">
+      <div class="intro">
+        <h1 id="title" data-text="siteTitle">The Road to QCD</h1>
+        <p data-text="intro"></p>
+      </div>
+      <div class="toolbar">
+        <div class="stats" data-label="scores">
+          <div><span data-text="score"></span><strong id="score">0</strong></div>
+          <div><span data-text="best"></span><strong id="best">0</strong></div>
+        </div>
+        <button class="primary" id="restart" type="button"><span aria-hidden="true">↻</span> <span class="button-label" data-text="restart"></span></button>
+      </div>
+      <div class="board-frame">
+        <div id="board" class="board" role="group" tabindex="0" data-label="board" aria-describedby="controls"></div>
+        <div class="end" id="end" hidden>
+          <div>
+            <h2 id="end-title"></h2>
+            <p id="end-copy"></p>
+            <button id="end-action" class="primary" type="button"></button>
+          </div>
+        </div>
+      </div>
+      <div class="controls" id="controls">
+        <div class="keys" data-label="movement">
+          <button data-direction="left" data-label="left">←</button>
+          <button data-direction="up" data-label="up">↑</button>
+          <button data-direction="down" data-label="down">↓</button>
+          <button data-direction="right" data-label="right">→</button>
+        </div>
+        <span data-text="controls"></span>
+      </div>
+      <p id="announcement" class="sr-only" role="status"></p>
+      <p id="storage-message" class="storage-message" role="status" data-text="storage" hidden></p>
+    </section>
+    <aside class="atlas" id="atlas" aria-labelledby="atlas-title">
+      <div class="atlas-header">
+        <h2 id="atlas-title" data-text="atlas"></h2>
+        <p data-text="sequenceRange"></p>
+        <div class="progress-caption"><span data-text="unlocked"></span><strong id="progress-label"></strong></div>
+        <progress id="progress" data-label="unlockedStages"></progress>
+      </div>
+      <ol id="stages"></ol>
+      <p class="atlas-note"><span data-text="noteBefore"></span><a href="https://doi.org/10.1103/RevModPhys.94.025005" target="_blank" rel="noopener">Kogut sequence</a><span data-text="noteAfter"></span></p>
+    </aside>
+  </main>
+  <footer class="site-footer">
+    <details class="credits">
+      <summary data-text="credits"></summary>
+      <h2 data-text="physics"></h2>
+      <ul id="reference-list"></ul>
+      <h2 data-text="code"></h2>
+      <p><span data-text="originalPrefix"></span><a href="https://github.com/gabrielecirulli/2048" target="_blank" rel="noopener" lang="en">Gabriele Cirulli’s 2048</a><span data-text="originalSuffix"></span><a href="https://github.com/gabrielecirulli/2048/blob/master/LICENSE.txt" target="_blank" rel="noopener" data-text="originalLicense"></a><span data-text="period"></span></p>
+      <p data-text="dependencies"></p>
+      <p><span data-text="license"></span> · <a href="./license.txt" data-text="mit">MIT License</a></p>
+    </details>
+  </footer>
+  <dialog id="details" aria-labelledby="details-title">
+    <div class="dialog-bar">
+      <div><p id="details-kicker"></p><h2 id="details-title"></h2></div>
+      <div class="dialog-actions">
+        <button class="language" type="button" data-language></button>
+        <form method="dialog"><button class="close" data-label="close" autofocus>×</button></form>
+      </div>
+    </div>
+    <div id="details-body"></div>
+  </dialog>
+</body>
+</html>
