@@ -13,6 +13,11 @@ Add cards in `dist/catalog.mjs`. Choose a stable `id`, a numeric `stage`, a `typ
 Add a stage-number entry to the `demos` map in `dist/demos.mjs`. Each entry has a `title` for its launch button and a lazy `load` callback returning an ES module. Export `mount(host, { signal, stage })` from the module. It receives the dedicated DOM container and can return `{ pause, resume, dispose }` or a promise that resolves to those controls. Supply both `pause` and `resume` to enable the pause button. Stop listeners, timers, or requests when the abort signal fires or in `dispose`. The game saves before opening the demo, and ignores board controls while the dialog is open. Demo modules do not need to read or write the board save.
 
 
+## Authors
+
+- Yibin Guo (project author)
+- OpenAI Codex (AI-assisted development)
+
 ## References and license
 
 The site footer cites the review that inspired the atlas sequence. The rules are inspired by [Gabriele Cirulli’s 2048](https://github.com/gabrielecirulli/2048), which has its own [MIT license](https://github.com/gabrielecirulli/2048/blob/master/LICENSE.txt). This implementation uses native browser APIs and has no third-party code dependencies or bundled 2048 code.
