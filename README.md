@@ -1,5 +1,7 @@
 # The Road to QCD
 
+[Play online](https://ybinguo.github.io/the-road-to-qcd/)
+
 This public preview includes the game and all 11 atlas milestones. The atlas starts with an empty card catalog while the educational material is under review.
 
 Serve `dist/` over HTTP. For local development, use `python3 -m http.server --directory dist` and open http://localhost:8000/. Run the rules and catalog checks with `node --test`.
