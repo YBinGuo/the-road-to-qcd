@@ -15,10 +15,10 @@ Add cards in `dist/catalog.mjs`. Choose a stable `id`, a numeric `stage`, a `typ
 Add a stage-number entry to the `demos` map in `dist/demos.mjs`. Each entry has a `title` for its launch button and a lazy `load` callback returning an ES module. Export `mount(host, { signal, stage })` from the module. It receives the dedicated DOM container and can return `{ pause, resume, dispose }` or a promise that resolves to those controls. Supply both `pause` and `resume` to enable the pause button. Stop listeners, timers, or requests when the abort signal fires or in `dispose`. The game saves before opening the demo, and ignores board controls while the dialog is open. Demo modules do not need to read or write the board save.
 
 
-## Authors
+## Contributors
 
 - Yibin Guo (project author)
-- [OpenAI Codex](https://github.com/codex) (AI-assisted development)
+- [OpenAI Codex](https://github.com/codex) — AI coding assistant supporting development, code review, and documentation under the project author's direction.
 
 ## References and license
 
