@@ -16,7 +16,7 @@ Add a stage-number entry to the `demos` map in `dist/demos.mjs`. Each entry has 
 ## Authors
 
 - Yibin Guo (project author)
-- OpenAI Codex (AI-assisted development)
+- [OpenAI Codex](https://github.com/codex) (AI-assisted development)
 
 ## References and license
 
